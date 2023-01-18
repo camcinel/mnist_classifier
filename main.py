@@ -59,7 +59,7 @@ def main(hyperparameters):
 
     image.export_image_plt(true_weights, 'weights.png')
 
-
+    # matplotlib plotting
     plt.figure(1)
     plt.legend()
     plt.savefig('loss.png')

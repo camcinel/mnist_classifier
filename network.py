@@ -161,7 +161,6 @@ class Network:
         X, y = minibatch
 
         # calculate probabilities
-        # y_proba = self.activation(np.transpose(self.weights) @ X)
         y_proba = self.forward(X)
 
         # calculate average loss
@@ -199,7 +198,6 @@ class Network:
         X, y = minibatch
 
         # calculate probabilities
-        # y_proba = self.activation(np.transpose(self.weights) @ X)
         y_proba = self.forward(X)
 
         # calculate average loss
