@@ -32,7 +32,7 @@ def main(hyperparameters):
 
 
     # perform k-fold cross validation
-    best_acc = 0
+    best_loss = np.inf
     count = 1
     for train, val in tqdm(data.generate_k_fold_set((X_train, y_train), k = hyperparameters.k_folds)):
         # generate instance of model
@@ -48,7 +48,8 @@ def main(hyperparameters):
         plt.plot(loss_array, label = 'loss ' + str(count))
         plt.figure(2)
         plt.plot(acc_array, label = 'accuracy ' + str(count))
-        if np.max(acc_array) > best_acc:
+        if np.min(loss_array) < best_loss:
+            best_loss = np.min(loss_array)
             best_model = softmax_reg
         count += 1
 
