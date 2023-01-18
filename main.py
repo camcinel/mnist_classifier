@@ -45,9 +45,9 @@ def main(hyperparameters):
                 softmax_reg.train(mini_batch)
             loss_array[epoch], acc_array[epoch] = softmax_reg.test(val)
         plt.figure(1)
-        plt.plot(loss_array, label = 'loss ' + str(count))
+        plt.plot(loss_array, label = 'loss fold ' + str(count))
         plt.figure(2)
-        plt.plot(acc_array, label = 'accuracy ' + str(count))
+        plt.plot(acc_array, label = 'accuracy fold ' + str(count))
         if np.min(loss_array) < best_loss:
             best_loss = np.min(loss_array)
             best_model = softmax_reg
