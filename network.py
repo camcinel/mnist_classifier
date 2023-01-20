@@ -64,9 +64,9 @@ def binary_cross_entropy(y, t):
     float 
         binary cross entropy loss value according to above definition
     """
-    ones_arr = np.ones(len(y))
+    ones_arr = np.ones(y.shape[0])
 
-    return - (np.dot(t, np.log(y)) + np.dot(ones_arr - t, np.log(ones_arr - y))) / len(y)
+    return - (np.dot(t, np.log(y)) + np.dot(ones_arr - t, np.log(ones_arr - y))) / y.shape[0]
 
 
 def multiclass_cross_entropy(y, t):
@@ -86,10 +86,7 @@ def multiclass_cross_entropy(y, t):
     float 
         multiclass cross entropy loss value according to above definition
     """
-    loss = 0
-    for index in range(len(y)):
-        loss -= np.dot(t[index], np.log(y[index]))
-    return loss
+    return - np.dot(t.flatten(), np.log(y).flatten()) / y.shape[0]
 
 
 class Network:
@@ -164,15 +161,15 @@ class Network:
         y_proba = self.forward(X)
 
         # calculate average loss
-        avg_loss = np.average(self.loss(y_proba, y))
+        avg_loss = self.loss(y_proba, y)
 
         # calculate accuracy
         y_pred = np.argmax(y_proba, axis=1)
         test_pred = np.argmax(y, axis=1)
-        acc = np.sum([y_pred == test_pred]) / len(y)
+        acc = np.sum(y_pred == test_pred) / y.shape[0]
 
         # update weights
-        self.weights = self.weights + (self.hyperparameters.learning_rate / len(y)) * (np.transpose(X) @ (y - y_proba))
+        self.weights = self.weights + (self.hyperparameters.learning_rate / y.shape[0]) * (np.transpose(X) @ (y - y_proba))
 
         return avg_loss, acc
 
@@ -201,11 +198,11 @@ class Network:
         y_proba = self.forward(X)
 
         # calculate average loss
-        avg_loss = np.average(self.loss(y_proba, y))
+        avg_loss = self.loss(y_proba, y)
 
         # calculate accuracy
         y_pred = np.argmax(y_proba, axis=1)
         test_pred = np.argmax(y, axis=1)
-        acc = np.sum([y_pred == test_pred]) / len(y)
+        acc = np.sum(y_pred == test_pred) / y.shape[0]
 
         return avg_loss, acc

@@ -8,7 +8,7 @@ def export_image(img_arr, name='test.tiff'):
     Image.fromarray(img_arr.reshape((28,28)).astype(np.uint8), 'P').save(file_path)
 
 def export_image_plt(img_arr, name='test.png'):
-    file_path = os.path.join(os.path.dirname(__file__), 'weight_images', name)
+    file_path = os.path.join(os.path.dirname(__file__), 'images', name)
     plt.figure(3)
     for index, weight in enumerate(img_arr):
         plt.subplot(2, 5, index + 1)
