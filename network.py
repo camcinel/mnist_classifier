@@ -44,7 +44,7 @@ def softmax(a):
     float
        Value after applying softmax (z from the slides).
     """
-    return np.exp(a) / np.sum(np.exp(a), axis = 1)[:, None]
+    return np.exp(a) / np.sum(np.exp(a), axis=1)[:, None]
 
 
 def binary_cross_entropy(y, t):
@@ -64,9 +64,8 @@ def binary_cross_entropy(y, t):
     float 
         binary cross entropy loss value according to above definition
     """
-    ones_arr = np.ones(y.shape[0])
-
-    return - (np.dot(t, np.log(y)) + np.dot(ones_arr - t, np.log(ones_arr - y))) / y.shape[0]
+    # ones_arr = np.ones(y.shape[0])
+    return - (np.dot(t, np.log(y.flatten())) + np.dot(1 - t, np.log(1 - y.flatten()))) / y.shape[0]
 
 
 def multiclass_cross_entropy(y, t):
@@ -164,13 +163,21 @@ class Network:
         avg_loss = self.loss(y_proba, y)
 
         # calculate accuracy
-        y_pred = np.argmax(y_proba, axis=1)
-        test_pred = np.argmax(y, axis=1)
+        if len(y.shape) > 1:
+            y_pred = np.argmax(y_proba, axis=1)
+            test_pred = np.argmax(y, axis=1)
+        else:
+            y = y.reshape(-1, 1)
+            y_pred = y_proba
+            mask = (y_proba > 0.5)
+            y_pred[mask] = 1
+            y_pred[~mask] = 0
+            test_pred = y
         acc = np.sum(y_pred == test_pred) / y.shape[0]
 
         # update weights
-        self.weights = self.weights + (self.hyperparameters.learning_rate / y.shape[0]) * (np.transpose(X) @ (y - y_proba))
-
+        self.weights = self.weights + (self.hyperparameters.learning_rate / y.shape[0]) * (
+                    np.transpose(X) @ (y - y_proba))
         return avg_loss, acc
 
     def test(self, minibatch):
@@ -201,8 +208,16 @@ class Network:
         avg_loss = self.loss(y_proba, y)
 
         # calculate accuracy
-        y_pred = np.argmax(y_proba, axis=1)
-        test_pred = np.argmax(y, axis=1)
+        if len(y.shape) > 1:
+            y_pred = np.argmax(y_proba, axis=1)
+            test_pred = np.argmax(y, axis=1)
+        else:
+            y = y.reshape(-1, 1)
+            y_pred = y_proba
+            mask = y_proba > 0.5
+            y_pred[mask] = 1
+            y_pred[~mask] = 0
+            test_pred = y
         acc = np.sum(y_pred == test_pred) / y.shape[0]
 
         return avg_loss, acc

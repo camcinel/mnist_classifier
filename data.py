@@ -5,7 +5,8 @@ import image
 from sklearn.decomposition import PCA
 import pickle
 
-def load_data(data_directory, train = True):
+
+def load_data(data_directory, train=True):
     if train:
         images = idx2numpy.convert_from_file(os.path.join(data_directory, 'train_images'))
         labels = idx2numpy.convert_from_file(os.path.join(data_directory, 'train_labels'))
@@ -18,10 +19,11 @@ def load_data(data_directory, train = True):
     for imnum in range(images.shape[0]):
         imvec = images[imnum, :, :].reshape(vdim, 1).squeeze()
         vectors[imnum, :] = imvec
-    
+
     return vectors, labels
 
-def z_score_normalize(X, u = None, sd = None):
+
+def z_score_normalize(X, u=None, sd=None):
     """
     Performs z-score normalization on X. 
 
@@ -56,7 +58,8 @@ def z_score_normalize(X, u = None, sd = None):
 
     return X_new, u, sd
 
-def min_max_normalize(X, _min = None, _max = None):
+
+def min_max_normalize(X, _min=None, _max=None):
     """
     Performs min-max normalization on X. 
 
@@ -89,6 +92,7 @@ def min_max_normalize(X, _min = None, _max = None):
 
     return X_new, _min, _max
 
+
 def onehot_encode(y):
     """
     Performs one-hot encoding on y.
@@ -107,6 +111,7 @@ def onehot_encode(y):
     """
     return np.eye(y.max() + 1)[y]
 
+
 def onehot_decode(y):
     """
     Performs one-hot decoding on y.
@@ -123,7 +128,8 @@ def onehot_decode(y):
     -------
         1d array (length n) of targets (k)
     """
-    return np.argmax(y, axis = 1)
+    return np.argmax(y, axis=1)
+
 
 def shuffle(dataset):
     """
@@ -154,6 +160,7 @@ def shuffle(dataset):
 
     return X_shuffled, y_shuffled
 
+
 def append_bias(X):
     """
     Append bias term for dataset.
@@ -167,7 +174,8 @@ def append_bias(X):
     -------
         2d numpy array with shape ((N+1),d)
     """
-    return np.insert(X, 0, 1, axis = 1)
+    return np.insert(X, 0, 1, axis=1)
+
 
 def generate_minibatches(dataset, batch_size=64):
     X, y = dataset
@@ -178,37 +186,56 @@ def generate_minibatches(dataset, batch_size=64):
 
     yield X[l_idx:], y[l_idx:]
 
-def generate_k_fold_set(dataset, k = 5): 
+
+def generate_k_fold_set(dataset, k=5):
     X, y = dataset
     if k == 1:
         yield (X, y), (X[len(X):], y[len(y):])
         return
 
     order = np.random.permutation(len(X))
-    
+
     fold_width = len(X) // k
 
     l_idx, r_idx = 0, fold_width
 
     for i in range(k):
-        train = np.concatenate([X[order[:l_idx]], X[order[r_idx:]]]), np.concatenate([y[order[:l_idx]], y[order[r_idx:]]])
+        train = np.concatenate([X[order[:l_idx]], X[order[r_idx:]]]), np.concatenate(
+            [y[order[:l_idx]], y[order[r_idx:]]])
         validation = X[order[l_idx:r_idx]], y[order[l_idx:r_idx]]
         yield train, validation
         l_idx, r_idx = r_idx, r_idx + fold_width
+
+
+def get_ints(dataset, int_1, int_2):
+    X, y = dataset
+
+    if int_1 == int_2:
+        raise Exception('Integer values must not be equal')
+
+    full_data = np.append(X, y.reshape(-1,1), axis=1)
+    specific_data = full_data[np.where((full_data[:, -1] == int_1) + (full_data[:, -1] == int_2))]
+
+    X_new, y_new = specific_data[:, :-1], specific_data[:, -1]
+
+    mask = y_new == int_1
+    y_new[mask] = 1
+    y_new[~mask] = 0
+    
+    return X_new, y_new.flatten()
+
+
 
 if __name__ == '__main__':
     X_train, y_train = load_data(os.path.join(os.path.dirname(__file__), 'data'))
 
     X_train, mean, std = z_score_normalize(X_train)
 
-    pca = PCA(n_components = 30)
+    pca = PCA(n_components=30)
     pca.fit(X_train)
     X_pca = pca.transform(X_train)
     X_inv = pca.inverse_transform(X_pca)
 
     for number in range(10):
-        image.export_image(X_train[number].reshape((28,28)), 'original' + str(number) + '.tiff')
+        image.export_image(X_train[number].reshape((28, 28)), 'original' + str(number) + '.tiff')
         image.export_image(X_inv[number].reshape((28, 28)), 'pca' + str(number) + '.tiff')
-
-
-
