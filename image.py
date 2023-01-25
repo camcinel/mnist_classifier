@@ -2,6 +2,8 @@ from PIL import Image
 import os
 import numpy as np
 from matplotlib import pyplot as plt
+import data
+from sklearn.decomposition import PCA
 
 
 def export_image(img_arr, name='test.tiff'):
