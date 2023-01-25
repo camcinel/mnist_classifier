@@ -4,8 +4,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-def export_image(img_arr, name='test.tiff'):
-    file_path = os.path.join(os.path.dirname(__file__), 'weight_images', name)
+def export_image(img_arr, name='test.png'):
+    file_path = os.path.join(os.path.dirname(__file__), name)
     Image.fromarray(img_arr.reshape((28, 28)).astype(np.uint8), 'P').save(file_path)
 
 

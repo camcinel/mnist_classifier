@@ -1,9 +1,6 @@
 import idx2numpy
 import numpy as np
 import os
-import image
-from sklearn.decomposition import PCA
-import pickle
 
 
 def load_data(data_directory, train=True):
@@ -213,7 +210,7 @@ def get_ints(dataset, int_1, int_2):
     if int_1 == int_2:
         raise Exception('Integer values must not be equal')
 
-    full_data = np.append(X, y.reshape(-1,1), axis=1)
+    full_data = np.append(X, y.reshape(-1, 1), axis=1)
     specific_data = full_data[np.where((full_data[:, -1] == int_1) + (full_data[:, -1] == int_2))]
 
     X_new, y_new = specific_data[:, :-1], specific_data[:, -1]
@@ -223,19 +220,3 @@ def get_ints(dataset, int_1, int_2):
     y_new[~mask] = 0
     
     return X_new, y_new.flatten()
-
-
-
-if __name__ == '__main__':
-    X_train, y_train = load_data(os.path.join(os.path.dirname(__file__), 'data'))
-
-    X_train, mean, std = z_score_normalize(X_train)
-
-    pca = PCA(n_components=30)
-    pca.fit(X_train)
-    X_pca = pca.transform(X_train)
-    X_inv = pca.inverse_transform(X_pca)
-
-    for number in range(10):
-        image.export_image(X_train[number].reshape((28, 28)), 'original' + str(number) + '.tiff')
-        image.export_image(X_inv[number].reshape((28, 28)), 'pca' + str(number) + '.tiff')

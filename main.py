@@ -38,7 +38,7 @@ def cross_validation(hyperparameters, int_1=None, int_2=None, softmax=True, grid
     acc_array_train = np.zeros((hyperparameters.k_folds, hyperparameters.epochs))
     acc_array_val = np.zeros((hyperparameters.k_folds, hyperparameters.epochs))
     for train, val in tqdm(data.generate_k_fold_set((X_train, y_train), k=hyperparameters.k_folds), desc=' k-folds',
-                           position=0, total=hyperparameters.k_folds):
+                           position=0, total=hyperparameters.k_folds, leave=False):
 
         # generate instance of model
         if softmax:
@@ -98,7 +98,7 @@ def cross_validation(hyperparameters, int_1=None, int_2=None, softmax=True, grid
             image.create_loss_plot(loss_array_train, loss_array_val, name='average_loss_' + str(int_1) + '_vs_'
                                                                           + str(int_2) + '.png')
 
-        return best_model, pca, param_1, param_2
+        return best_model, pca, best_param_1, best_param_2
 
 
 def test_model(model, pca, param_1, param_2, hyperparameters, int_1=None, int_2=None, softmax=True):
@@ -116,17 +116,22 @@ def test_model(model, pca, param_1, param_2, hyperparameters, int_1=None, int_2=
         y_test = data.onehot_encode(y_test)
 
     avg_loss, acc = model.test((X_test, y_test))
-    print('Loss is ' + str(avg_loss))
-    print('Accuracy is ' + str(acc))
+    print(f'Loss is {avg_loss}')
+    print(f'Accuracy is {acc}')
 
 
-def main(hyperparameters, softmax=True):
-    model, pca, param_1, param_2 = cross_validation(hyperparameters, softmax=softmax)
-    test_model(model, pca, param_1, param_2, hyperparameters, softmax=softmax)
-    model, pca, param_1, param_2 = cross_validation(hyperparameters, int_1=2, int_2=7, softmax=False)
-    test_model(model, pca, param_1, param_2, hyperparameters, int_1=2, int_2=7, softmax=False)
-    model, pca, param_1, param_2 = cross_validation(hyperparameters, int_1=5, int_2=8, softmax=False)
-    test_model(model, pca, param_1, param_2, hyperparameters, int_1=5, int_2=8, softmax=False)
+def main(hyperparameters):
+    if not hyperparameters.no_softmax:
+        print('Softmax regression:')
+        model, pca, param_1, param_2 = cross_validation(hyperparameters)
+        test_model(model, pca, param_1, param_2, hyperparameters)
+    if not hyperparameters.no_logistic:
+        print('Logistic regression 2 vs 7:')
+        model, pca, param_1, param_2 = cross_validation(hyperparameters, int_1=2, int_2=7, softmax=False)
+        test_model(model, pca, param_1, param_2, hyperparameters, int_1=2, int_2=7, softmax=False)
+        print('Logistic regression 5 vs 8:')
+        model, pca, param_1, param_2 = cross_validation(hyperparameters, int_1=5, int_2=8, softmax=False)
+        test_model(model, pca, param_1, param_2, hyperparameters, int_1=5, int_2=8, softmax=False)
 
 
 if __name__ == '__main__':
@@ -144,7 +149,9 @@ if __name__ == '__main__':
                         help='number of folds for cross-validation')
     parser.add_argument('--p', type=int, default=100,
                         help='number of principal components')
+    parser.add_argument('--no-softmax', action='store_false', help='do not perform softmax regression')
+    parser.add_argument('--no-logistic', action='store_false', help='do not perform logistic regression')
 
     hyperparameters = parser.parse_args()
     os.makedirs('images', exist_ok=True)
-    main(hyperparameters, softmax=True)
+    main(hyperparameters)
