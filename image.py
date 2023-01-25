@@ -12,6 +12,16 @@ def export_image(img_arr, name='test.png'):
 
 
 def export_image_plt(img_arr, name='test.png'):
+    """
+
+    Parameters
+    ----------
+    img_arr (np.array) : numpy array of 784 columns
+    name (str) : file name of save chart
+
+    pyplot saves figure at /images/name
+
+    """
     file_path = os.path.join(os.path.dirname(__file__), 'images', name)
     plt.figure(3)
     for index, weight in enumerate(img_arr):
@@ -25,6 +35,18 @@ def export_image_plt(img_arr, name='test.png'):
 
 
 def create_loss_plot(train_loss, val_loss, name='average_loss.png'):
+    """
+    Creates loss plot over training epochs
+
+    Parameters
+    ----------
+    train_loss (np.array) : array of average losses on the training set for each epoch
+    val_loss (np.array) : array of average losses on the validation set for each epoch
+    name (str) : file name of saved chart
+
+    pyplot saves figure at /images/name
+
+    """
     plt.figure()
     plt.title(name)
     plt.plot(np.average(train_loss, axis=0), label='train', linestyle='dashed')

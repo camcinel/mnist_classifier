@@ -11,29 +11,39 @@ param_grid = {
 }
 
 def create_grid(**kwargs):
+    """
+    Creates grit for grid_search
+    Parameters
+    ----------
+    kwargs (dict) : Dictionary with keys as parameters and values as list of different values for that parameter
+
+    Returns
+    -------
+        dict : Dictionary where each parameter has only one corresponding value
+    """
     keys = kwargs.keys()
     vals = kwargs.values()
     for instance in itertools.product(*vals):
         yield dict(zip(keys, instance))
 
+if __name__ == '__main__':
+    parameters = argparse.Namespace()
+    parameters.epochs = 100
+    parameters.k_folds = 5
+    parameters.no_softmax = False
+    parameters.no_logistic = False
 
-parameters = argparse.Namespace()
-parameters.epochs = 100
-parameters.k_folds = 5
-parameters.no_softmax = False
-parameters.no_logistic = False
+    best_acc = 0
+    for params in create_grid(**param_grid):
+        parameters.learning_rate = params['learning-rate']
+        parameters.normalization = params['normalization']
+        parameters.batch_size = params['batch-size']
+        parameters.p = params['p']
+        hyperparameters, acc = main.cross_validation(parameters, int_1=2, int_2=7, softmax=parameters.softmax, grid_search=True)
+        if acc > best_acc:
+            best_acc = acc
+            best_hyperparameters = hyperparameters
 
-best_acc = 0
-for params in create_grid(**param_grid):
-    parameters.learning_rate = params['learning-rate']
-    parameters.normalization = params['normalization']
-    parameters.batch_size = params['batch-size']
-    parameters.p = params['p']
-    hyperparameters, acc = main.cross_validation(parameters, int_1=2, int_2=7, softmax=parameters.softmax, grid_search=True)
-    if acc > best_acc:
-        best_acc = acc
-        best_hyperparameters = hyperparameters
-
-print(f'Best accuracy is {best_acc}')
-print('Best hyperparameters are: ')
-print(best_hyperparameters)
+    print(f'Best accuracy is {best_acc}')
+    print('Best hyperparameters are: ')
+    print(best_hyperparameters)

@@ -4,6 +4,19 @@ import os
 
 
 def load_data(data_directory, train=True):
+    """
+
+    Parameters
+    ----------
+    data_directory : file path to data
+    train (Boolean) : returns training data if True, returns test data otherwise
+
+    Returns
+    -------
+        Tuple:
+            2-d Array of features
+            1-d Array of labels
+    """
     if train:
         images = idx2numpy.convert_from_file(os.path.join(data_directory, 'train_images'))
         labels = idx2numpy.convert_from_file(os.path.join(data_directory, 'train_labels'))
@@ -175,6 +188,19 @@ def append_bias(X):
 
 
 def generate_minibatches(dataset, batch_size=64):
+    """
+    Generates the mini-batches for the stochastic gradient descent
+
+    Parameters
+    ----------
+    dataset (Tuple) : Tuple containing feature array and corresponding labels
+    batch_size (int): size of batches to be created
+
+    Returns
+    -------
+        Tuple:
+            Contains mini-batches of the batch_size as tuples with features array and corresponding labels
+    """
     X, y = dataset
     l_idx, r_idx = 0, batch_size
     while r_idx < len(X):
@@ -185,6 +211,19 @@ def generate_minibatches(dataset, batch_size=64):
 
 
 def generate_k_fold_set(dataset, k=5):
+    """
+    Generates the k-folds for k-fold cross validation
+
+    Parameters
+    ----------
+    dataset (Tuple) : Tuple containing feature array and corresponding labels
+    k (int) : Number of k-folds to be created
+
+    Returns
+    -------
+        Tuple:
+            Contains a tuple of training set and a single hold out fold as validation set
+    """
     X, y = dataset
     if k == 1:
         yield (X, y), (X[len(X):], y[len(y):])
@@ -205,6 +244,21 @@ def generate_k_fold_set(dataset, k=5):
 
 
 def get_ints(dataset, int_1, int_2):
+    """
+    Gets the data whose categories are int_1 and int_2
+
+    Parameters
+    ----------
+    dataset (Tuple) : Tuple containing feature array and corresponding labels
+    int_1 : first label
+    int_2 : second label
+
+    Returns
+    -------
+        Tuple:
+            Feature array corresponding to the two categories int_1 and int_2
+            Label array corresponding to the two categories int_1 and int_2
+    """
     X, y = dataset
 
     if int_1 == int_2:

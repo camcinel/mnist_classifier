@@ -10,12 +10,46 @@ from tqdm import tqdm
 
 
 def pre_process_data(dataset, normalization_func, param_1=None, param_2=None):
+    """
+    Performs normalization of dataset
+
+    Parameters
+    ----------
+    dataset (Tuple) : dataset to be normalized
+    normalization_func : normalization function to be applied, either data.min_max_normalize or data.z_score_normalize
+    param_1 : First parameter to use in the normalization. If None, parameter will be calculate in the normalization
+    param_2 : Second parameter to use in the normalization. If None, parameter will be calculate in the normalization
+
+    Returns
+    -------
+        Tuple : Normalized dataset
+        param_1 : First parameter output from the normalization function
+        param_2 : Second parameter output from the normalization function
+    """
     X, param_1, param_2 = normalization_func(dataset[0], param_1, param_2)
     X = data.append_bias(X)
     return (X, dataset[1]), param_1, param_2
 
 
 def cross_validation(hyperparameters, int_1=None, int_2=None, softmax=True, grid_search=False):
+    """
+    Performs cross validation procedure
+
+    Parameters
+    ----------
+    hyperparameters : hyperparameters taken from the argparser Namespace
+    int_1 (int) : First label for the logistic regression. Should be None for softmax regression
+    int_2 (int) : Second label for the logistic regression. Should be None for softmax regression
+    softmax (Boolean) : Performs softmax regression if True. Otherwise performs logistic regression
+    grid_search (Boolean) : Outputs only accuracy if True. Otherwise returns normal outputs
+
+    Returns
+    -------
+        best_model : Instance of network.Network class with lowest loss on the validation set at the end of training
+        pca : Instance of sklearn's PCA class fitted to dataset
+        best_param_1 (int) : First parameter from the normalization function for the test set with best performance
+        best_param_2 (int) : Second parameter from the normalization function for the test set with best performance
+    """
     # load data
     X_train, y_train = data.load_data(os.path.join(os.path.dirname(__file__), 'data'))
 
@@ -102,6 +136,24 @@ def cross_validation(hyperparameters, int_1=None, int_2=None, softmax=True, grid
 
 
 def test_model(model, pca, param_1, param_2, hyperparameters, int_1=None, int_2=None, softmax=True):
+    """
+    Tests a trained model on the test data set
+
+    Parameters
+    ----------
+    model : Instance of network.Network class to be tested
+    pca : Instance of sklearn's PCA class to transform the test set
+    param_1 (int) : First parameter for normalization function
+    param_2 (int) : Second parameter for normalization function
+    hyperparameters : Hyperparameters from argparser's Namespace
+    int_1 (int) : First label for logistic regression. Should be None for softmax regression
+    int_2 (int) : Second label for logistic regression. Should be None for softmax regression
+    softmax (Boolean) : If True, perform softmax regression. Otherwise perform logistic regression
+
+    Returns
+    -------
+        Prints loss and accuracy on test set
+    """
     X_test, y_test = data.load_data(os.path.join(os.path.dirname(__file__), 'data'), train=False)
 
     if not softmax:
@@ -153,5 +205,7 @@ if __name__ == '__main__':
     parser.add_argument('--no-logistic', action='store_false', help='do not perform logistic regression')
 
     hyperparameters = parser.parse_args()
+
+    # need to make image directory if first time running
     os.makedirs('images', exist_ok=True)
     main(hyperparameters)
