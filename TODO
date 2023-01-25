@@ -1,5 +1,0 @@
-Move normalization inside of k-fold training
-Move chart plotting into image.py
-Move cross-validation into separate function
-Create sigmoid procedure
-Create grid_search.py to perform hyperparameter grid search
