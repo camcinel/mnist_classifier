@@ -117,3 +117,47 @@ def make_PCA_figure_2(trainBool,errBool):
     plt.show()
     plt.clf()
     plt.close()
+    
+    
+ def plot_PCA_10(trainBool, pval):
+    """
+    trainBool: use the training data or the testing data?
+    pval: the PCA degree to plot for the 2-7, 5-8, and all-class datasets
+    """
+    fig, ax = plt.subplots(1,3)
+    fig.set_size_inches(10,3)
+    X, y = data.load_data(os.path.join(os.path.dirname(__file__), 'data'), train=trainBool)
+    #print(np.argwhere(y==2).flatten())
+    class_2_7_data = data.get_ints((X,y),2,7)
+    class_5_8_data = data.get_ints((X,y),5,8)
+    
+    pca_all = PCA(n_components=pval)#hyperparameters.p)
+    pca_all.fit(X)
+    components_all=pca_all.components_
+    #print(components_all[9].reshape(28,28))
+    ax[0].pcolor(components_all[pval-1].reshape(28,28),cmap='gray')
+    ax[0].set_axis_off()
+    ax[0].set_ylim(ax[0].get_ylim()[::-1])
+    ax[0].set_title('PCA fit all classes')
+
+    pca_2_7 = PCA(n_components=pval)#hyperparameters.p)
+    pca_2_7.fit(class_2_7_data[0])
+    components_2_7=pca_2_7.components_
+    #print(components_all[9].reshape(28,28))
+    ax[1].pcolor(components_2_7[pval-1].reshape(28,28),cmap='gray')
+    ax[1].set_axis_off()
+    ax[1].set_ylim(ax[1].get_ylim()[::-1])
+    ax[1].set_title('PCA fits 2s & 7s classes')
+
+    pca_5_8 = PCA(n_components=pval)#hyperparameters.p)
+    pca_5_8.fit(class_5_8_data[0])
+    components_5_8=pca_5_8.components_
+    #print(components_all[9].reshape(28,28))
+    ax[2].pcolor(components_5_8[pval-1].reshape(28,28),cmap='gray')
+    ax[2].set_axis_off()
+    ax[2].set_ylim(ax[2].get_ylim()[::-1])
+    ax[2].set_title('PCA fits 5s & 8s classes')
+
+    plt.show()
+    plt.clf()
+    plt.close()
