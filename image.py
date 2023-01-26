@@ -119,44 +119,51 @@ def make_PCA_figure_2(trainBool,errBool):
     plt.close()
     
     
- def plot_PCA_10(trainBool, pval):
+def plot_PCA_10(trainBool, pval):
     """
     trainBool: use the training data or the testing data?
-    pval: the PCA degree to plot for the 2-7, 5-8, and all-class datasets
-    """
-    fig, ax = plt.subplots(1,3)
-    fig.set_size_inches(10,3)
-    X, y = data.load_data(os.path.join(os.path.dirname(__file__), 'data'), train=trainBool)
-    #print(np.argwhere(y==2).flatten())
-    class_2_7_data = data.get_ints((X,y),2,7)
-    class_5_8_data = data.get_ints((X,y),5,8)
+    pval: the max number of PCA components to plot for the 2-7, 5-8, and all-class datasets
     
+    This function produces a pvalx3 figure of the principle components of the three groups of datasets
+    """
+    fig, ax = plt.subplots(pval,3)
+    fig.set_size_inches(4,8)
+    fig.suptitle('PCA components from data classes:')
+    X, y = data.load_data(os.path.join(os.path.dirname(__file__), 'data'), train=trainBool)
+    class_2_7_data = data.get_ints((X,y),2,7) # pick out the 2s and 7s 
+    class_5_8_data = data.get_ints((X,y),5,8) # pick out the 5s and 8s
+    
+    # All examples of the dataset
     pca_all = PCA(n_components=pval)#hyperparameters.p)
-    pca_all.fit(X)
+    pca_all.fit(X) # fit to the whole dataset
     components_all=pca_all.components_
-    #print(components_all[9].reshape(28,28))
-    ax[0].pcolor(components_all[pval-1].reshape(28,28),cmap='gray')
-    ax[0].set_axis_off()
-    ax[0].set_ylim(ax[0].get_ylim()[::-1])
-    ax[0].set_title('PCA fit all classes')
+    print(np.min(components_all[0]))
+    print(np.max(components_all[0]))
+    ax[0][0].set_title('all')
+    for pc in range(pval): # plot each of the pval PCA components in 28x28 image
+        ax[pc][0].pcolor(components_all[pc].reshape(28,28),cmap='gray',vmin=-0.2,vmax=0.2)
+        ax[pc][0].set_axis_off()
+        ax[pc][0].set_ylim(ax[pc][0].get_ylim()[::-1])
 
+    # 2s and 7s
     pca_2_7 = PCA(n_components=pval)#hyperparameters.p)
     pca_2_7.fit(class_2_7_data[0])
     components_2_7=pca_2_7.components_
-    #print(components_all[9].reshape(28,28))
-    ax[1].pcolor(components_2_7[pval-1].reshape(28,28),cmap='gray')
-    ax[1].set_axis_off()
-    ax[1].set_ylim(ax[1].get_ylim()[::-1])
-    ax[1].set_title('PCA fits 2s & 7s classes')
+    ax[0][1].set_title('2s & 7s')
+    for pc in range(pval): # plot each of the pval PCA components in 28x28 image
+        ax[pc][1].pcolor(components_2_7[pc].reshape(28,28),cmap='gray',vmin=-0.2,vmax=0.2)
+        ax[pc][1].set_axis_off()
+        ax[pc][1].set_ylim(ax[pc][1].get_ylim()[::-1])
 
+    # 5s and 8s
     pca_5_8 = PCA(n_components=pval)#hyperparameters.p)
     pca_5_8.fit(class_5_8_data[0])
     components_5_8=pca_5_8.components_
-    #print(components_all[9].reshape(28,28))
-    ax[2].pcolor(components_5_8[pval-1].reshape(28,28),cmap='gray')
-    ax[2].set_axis_off()
-    ax[2].set_ylim(ax[2].get_ylim()[::-1])
-    ax[2].set_title('PCA fits 5s & 8s classes')
+    ax[0][2].set_title('5s & 8s')
+    for pc in range(pval): # plot each of the pval PCA components in 28x28 image
+        ax[pc][2].pcolor(components_5_8[pc].reshape(28,28),cmap='gray',vmin=-0.2,vmax=0.2)
+        ax[pc][2].set_axis_off()
+        ax[pc][2].set_ylim(ax[pc][2].get_ylim()[::-1])
 
     plt.show()
     plt.clf()
