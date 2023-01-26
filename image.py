@@ -16,7 +16,7 @@ def export_image_plt(img_arr, name='test.png'):
 
     Parameters
     ----------
-    img_arr (np.array) : numpy array of 784 columns
+    img_arr (np.array) : numpy array of size (10, 784)
     name (str) : file name of save chart
 
     pyplot saves figure at /images/name

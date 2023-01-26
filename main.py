@@ -201,8 +201,8 @@ if __name__ == '__main__':
                         help='number of folds for cross-validation')
     parser.add_argument('--p', type=int, default=100,
                         help='number of principal components')
-    parser.add_argument('--no-softmax', action='store_false', help='do not perform softmax regression')
-    parser.add_argument('--no-logistic', action='store_false', help='do not perform logistic regression')
+    parser.add_argument('--no-softmax', action='store_true', help='do not perform softmax regression')
+    parser.add_argument('--no-logistic', action='store_true', help='do not perform logistic regression')
 
     hyperparameters = parser.parse_args()
 
